@@ -8,3 +8,6 @@ status.register("clock",
 
 status.register("temp",
     format="{temp:.0f}°C",)
+
+
+status.run()
