@@ -1,0 +1,141 @@
+
+#check for UEFI mode
+ls /sys/firmware/efi/efivars
+
+#update system clock
+timedatectl set-ntp true
+
+#test system clock
+timedatectl status
+
+#check the drives
+lsblk
+
+#partition the drive
+cfdisk
+
+/dev/sdx1, EFI System Parition(boot), bootable, 260-512mb
+/dev/sdx2, Linux filesystem(root), rest of the drive
+
+#check the paritions
+lsblk /dev/sdx
+
+#set the UEFI parition
+mkfs.fat -F32 /dev/sdx1
+
+#set the linux parition
+mkfs.ext4 /dev/sdx2
+
+#mount the partitions
+the root:
+mount /dev/sdx2 /mnt
+the boot:
+mkdir -p /mnt/boot
+mount /dev/sdx1    /mnt/boot
+
+#optional - set the pacman mirrors
+edit /etc/pacman.d/mirrorlist
+
+#install the base packages
+pacstrap /mnt
+
+#generate the fstab
+genfstab -U /mnt >>   /mnt/etc/fstab
+
+#check the fstab
+cat /mnt/etc/fstab
+
+#change the root
+arch-chroot /mnt   /bin/bash
+
+#set the locale
+uncomment en_US.UTF-8 in /etc/locale.gen
+
+#generate the locale
+locale-gen
+
+#edit the locale
+edit /etc/locale.conf with LANG=en_US.UTF-8
+
+#select a timezone
+tzselect
+
+#create a symbolic link
+ln -s /usr/share/zoneinfo/America/New_York   /etc/localtime
+
+#check for an ESP
+parted /dev/sda print
+look for a small 512mb or less partiton with a vfat file system
+
+#install grub and efibootmgr
+pacman -S grub efibootmgr
+grub-install  --target=x86_64-efi  --efi-directory=/boot  --bootloader-id=grub
+grub-mkconfig -o boot/grub/grub.cfg
+
+#set up network connection
+get interface name:
+ip link
+systemctl enable dhcpcd@interface.service
+
+#set the hostname
+echo Arch-Box > /etc/hostname
+
+#edit hosts file with new host name
+edit /etc/hosts
+make it look like:
+127.0.0.1    localhost.localdomain   localhost     Arch-Box
+::1                 localhost.localdomain   localhost     Arch-Box
+
+#set root password
+passwd
+
+#exit chroot environment
+exit
+
+#unmount and reboot
+umount -R /mnt
+reboot
+
+#create a new user
+useradd  -m  -G wheel, users  -S /bin/bash  PaleBoy
+passwd PaleBoy
+
+#install sudo
+pacman -S sudo
+
+#give me sudo rights
+EDITOR=nano visudo
+uncomment the line %wheel ALL=(ALL) ALL
+
+#add multilib to pacman for 64 bit packages
+edit pacman.conf and add:
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+
+#update te repos
+pacman -Sy
+
+#install xorg
+pacman -S xorg-server xorg-server-utils
+
+#install nvidea drivers
+pacman -S nvidia nvidia-libgl
+
+#install yaourt for AUR packages
+make a builds folder first:
+mkdir builds
+then install:
+cd builds
+git clone https://aur.archlinux.org/package-query.git
+cd package-query
+makepkg -sri
+cd
+git clone https://aur.archlinux.org/yaourt.git
+makepkg -si
+cd
+
+#refresh yaourt
+yaourt -Syu --aur
+
+#install i3
+pacman -S i3
