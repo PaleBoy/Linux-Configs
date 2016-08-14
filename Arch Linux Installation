@@ -12,32 +12,31 @@ timedatectl status
 lsblk
 
 #partition the drive
-cfdisk
-
-/dev/sdx1, EFI System Parition(boot), bootable, 260-512mb
-/dev/sdx2, Linux filesystem(root), rest of the drive
+parted /dev/sda
+mklabel gpt
+mkpart ESP fat32 1MiB 513MiB
+set 1 boot on
+mkpart primary ext4 513MiB maxsizeGiB
+quit
 
 #check the paritions
-lsblk /dev/sdx
+lsblk /dev/sda
 
 #set the UEFI parition
-mkfs.fat -F32 /dev/sdx1
+mkfs.fat -F32 /dev/sda1
 
 #set the linux parition
-mkfs.ext4 /dev/sdx2
+mkfs.ext4 /dev/sda2
 
 #mount the partitions
-the root:
-mount /dev/sdx2 /mnt
 the boot:
 mkdir -p /mnt/boot
-mount /dev/sdx1    /mnt/boot
-
-#optional - set the pacman mirrors
-edit /etc/pacman.d/mirrorlist
+mount /dev/sda1    /mnt/boot
+the root:
+mount /dev/sda2 /mnt
 
 #install the base packages
-pacstrap /mnt
+pacstrap -i /mnt base base-devel
 
 #generate the fstab
 genfstab -U /mnt >>   /mnt/etc/fstab
@@ -63,14 +62,10 @@ tzselect
 #create a symbolic link
 ln -s /usr/share/zoneinfo/America/New_York   /etc/localtime
 
-#check for an ESP
-parted /dev/sda print
-look for a small 512mb or less partiton with a vfat file system
-
 #install grub and efibootmgr
 pacman -S grub efibootmgr
 grub-install  --target=x86_64-efi  --efi-directory=/boot  --bootloader-id=grub
-grub-mkconfig -o boot/grub/grub.cfg
+grub-mkconfig -o /boot/grub/grub.cfg
 
 #set up network connection
 get interface name:
