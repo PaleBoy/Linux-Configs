@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<title>Start Page</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+<style>
+a:hover {color: #c5c8c6;}
+a:link {color: #263238;}
+a.Cat1 {padding: 25px 25px 25px 25px;}
+a.Cat2 {padding: 25px 25px 25px 25px;}
+a.Cat3 {padding: 25px 25px 25px 25px;}
+i.fa-home:hover {color: #ec5f67;}
+i.fa-cc-discover:hover {color: #f29930;}
+</style>
+<body style="background-color: #263238;">
+
+    <!-- Navigation -->
+    <nav>
+        <ul class="w3-navbar w3-top" style="background-color: #c3e88d;">
+            <li><a class="w3-hover-light-green" href="#"><i class="material-icons">menu</i></a></li>
+        </ul>
+    </nav>
+
+    <!-- Header -->
+    <header class="w3-container w3-padding-64 w3-center" style="background-color: #c3e88d;">
+        <h1>Header</h1>
+    </header>
+
+    <!-- Content -->
+    <section class="w3-padding-32">
+        <header class="w3-content w3-navbar w3-center" style="background-color: #c3e88d; max-width: 1200px;">
+            <h2>Links</h2>
+        </header>
+        <div class="w3-content w3-center w3-navbar" style="background-color: #c3e88d; max-width: 1200px;">
+            <a class="Cat1" href="#" onclick="openCat('Cat1')">Cat1</a>
+            <a class="Cat2"href="#" onclick="openCat('Cat2')">Cat2</a>
+            <a class="Cat3"href="#" onclick="openCat('Cat3')">Cat3</a>
+        </div>
+
+        <div id="Cat1" class="w3-content w3-center w3-padding-64 w3-container cat" style="background-color: #37474f; max-width: 1200px;">
+            <a href="#"><i class="fa fa-home w3-xxxlarge"></i></a>
+            <a href="#"><i class="fa fa-cc-discover w3-xxxlarge"></i></a>
+            <a href="#">Link3</a>
+            <a href="#">Link4</a>
+        </div>
+
+        <div id="Cat2" class="w3-content w3-center w3-padding-64 w3-container cat" style="background-color: #37474f; max-width: 1200px;">
+            <a href="#">Link1</a>
+            <a href="#">Link2</a>
+            <a href="#">Link3</a>
+            <a href="#">Link4</a>
+        </div>
+
+        <div id="Cat3" class="w3-content w3-center w3-padding-64 w3-container cat" style="background-color: #37474f; max-width: 1200px;">
+            <a href="#">Link1</a>
+            <a href="#">Link2</a>
+            <a href="#">Link3</a>
+            <a href="#">Link4</a>
+        </div>
+    </section>
+
+    <section class="w3-padding-32">
+        <header class="w3-content w3-navbar w3-center" style="background-color: #c3e88d; max-width: 1200px;">
+            <h2>Something else</h2>
+        </header>
+        <div class="w3-content w3-center w3-navbar" style="background-color: #c3e88d; max-width: 1200px;">
+            <a class="Cat1" href="#" onclick="openCat('Cat1')">Cat1</a>
+            <a class="Cat2"href="#" onclick="openCat('Cat2')">Cat2</a>
+            <a class="Cat3"href="#" onclick="openCat('Cat3')">Cat3</a>
+        </div>
+
+        <div id="Cat1" class="w3-content w3-center w3-padding-64 w3-container cat" style="background-color: #37474f; max-width: 1200px;">
+            <a href="#"><i class="fa fa-home w3-xxxlarge"></i></a>
+            <a href="#"><i class="fa fa-cc-discover w3-xxxlarge"></i></a>
+            <a href="#">Link3</a>
+            <a href="#">Link4</a>
+        </div>
+
+        <div id="Cat2" class="w3-content w3-center w3-padding-64 w3-container cat" style="background-color: #37474f; max-width: 1200px;">
+            <a href="#">Link1</a>
+            <a href="#">Link2</a>
+            <a href="#">Link3</a>
+            <a href="#">Link4</a>
+        </div>
+
+        <div id="Cat3" class="w3-content w3-center w3-padding-64 w3-container cat" style="background-color: #37474f; max-width: 1200px;">
+            <a href="#">Link1</a>
+            <a href="#">Link2</a>
+            <a href="#">Link3</a>
+            <a href="#">Link4</a>
+        </div>
+    </section>
+
+    <script>
+    openCat("Cat1")
+    function openCat(catName) {
+        var i;
+        var x = document.getElementsByClassName("cat");
+        for (i = 0; i < x.length; i++) {
+            x[i].style.display = "none";
+        }
+        document.getElementById(catName).style.display = "block";
+    }
+    </script>
+
+    <!-- Footer -->
+    <footer class="w3-container w3-bottom w3-center" style="background-color: #c3e88d;">
+        <input class="w3-input w3-border" type="text" placeholder="Search..." style="max-width: 300px">
+    </footer>
+
+</body>
+</html>
