@@ -1,0 +1,84 @@
+Script started on Sun 02 Oct 2016 10:06:51 AM EDT
+]0;paleboy@Arch-Box:~/School/Sys OPS[32m[[m[32m~/School/Sys OPS[m[32m]
+[m[31mpaleboy[m[33m->[m cat ThreadHW1.c
+#include<stdio.h>
+#include<pthread.h>
+#define NUM_THREADS 4
+
+void *Fib(void *arg)
+{
+    int a=0;
+    int b =1;
+    int c = 0;
+    int n = (int)arg;
+
+    printf("%d, %d, ", a, b);
+    for (int i =0; i < n; i++)
+    {
+        c = a + b;
+        printf("%d, ", c);
+        a = b;
+        b = c;
+    }
+}
+
+main(int argc, char *argv[])
+{
+    pthread_t thread1, thread2, thread3, thread4;
+
+    int count1 = atoi(argv[1]);
+    int count2 = atoi(argv[2]);
+    int count3 = atoi(argv[3]);
+    int count4 = atoi(argv[4]);
+
+    printf("Zach, ");
+    pthread_create(&thread1, NULL, Fib, (void *)count1);
+    printf("\n");
+    printf("Shunk, ");
+    pthread_create(&thread2, NULL, Fib, (void *)count2);
+    printf("\n");
+    printf("ESU, ");
+    pthread_create(&thread3, NULL, Fib, (void *)count3);
+    printf("\n");
+    printf("CPSC, ");
+    pthread_create(&thread4, NULL, Fib, (void *)count4);
+    printf("\n");
+    pthread_exit(NULL);
+}
+]0;paleboy@Arch-Box:~/School/Sys OPS[32m[[m[32m~/School/Sys OPS[m[32m]
+[m[31mpaleboy[m[33m->[m gcc ThreadHW1.c -lpthread
+[01m[KThreadHW1.c:[m[K In function ‘[01m[KFib[m[K’:
+[01m[KThreadHW1.c:10:13:[m[K [01;35m[Kwarning: [m[Kcast from pointer to integer of different size [[01;35m[K-Wpointer-to-int-cast[m[K]
+     int n = [01;35m[K([m[Kint)arg;
+             [01;35m[K^[m[K
+[01m[KThreadHW1.c:[m[K At top level:
+[01m[KThreadHW1.c:22:1:[m[K [01;35m[Kwarning: [m[Kreturn type defaults to ‘[01m[Kint[m[K’ [[01;35m[K-Wimplicit-int[m[K]
+ [01;35m[Kmain[m[K(int argc, char *argv[])
+ [01;35m[K^~~~[m[K
+[01m[KThreadHW1.c:[m[K In function ‘[01m[Kmain[m[K’:
+[01m[KThreadHW1.c:26:18:[m[K [01;35m[Kwarning: [m[Kimplicit declaration of function ‘[01m[Katoi[m[K’ [[01;35m[K-Wimplicit-function-declaration[m[K]
+     int count1 = [01;35m[Katoi[m[K(argv[1]);
+                  [01;35m[K^~~~[m[K
+[01m[KThreadHW1.c:32:41:[m[K [01;35m[Kwarning: [m[Kcast to pointer from integer of different size [[01;35m[K-Wint-to-pointer-cast[m[K]
+     pthread_create(&thread1, NULL, Fib, [01;35m[K([m[Kvoid *)count1);
+                                         [01;35m[K^[m[K
+[01m[KThreadHW1.c:35:41:[m[K [01;35m[Kwarning: [m[Kcast to pointer from integer of different size [[01;35m[K-Wint-to-pointer-cast[m[K]
+     pthread_create(&thread2, NULL, Fib, [01;35m[K([m[Kvoid *)count2);
+                                         [01;35m[K^[m[K
+[01m[KThreadHW1.c:38:41:[m[K [01;35m[Kwarning: [m[Kcast to pointer from integer of different size [[01;35m[K-Wint-to-pointer-cast[m[K]
+     pthread_create(&thread3, NULL, Fib, [01;35m[K([m[Kvoid *)count3);
+                                         [01;35m[K^[m[K
+[01m[KThreadHW1.c:41:41:[m[K [01;35m[Kwarning: [m[Kcast to pointer from integer of different size [[01;35m[K-Wint-to-pointer-cast[m[K]
+     pthread_create(&thread4, NULL, Fib, [01;35m[K([m[Kvoid *)count4);
+                                         [01;35m[K^[m[K
+]0;paleboy@Arch-Box:~/School/Sys OPS[32m[[m[32m~/School/Sys OPS[m[32m]
+[m[31mpaleboy[m[33m->[m ./a.out 7 11 5 9
+Zach,
+Shunk,
+ESU,
+CPSC,
+0, 1, 1, 2, 3, 5, 8, 13, 21, 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 0, 1, 1, 2, 3, 5, 8, 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, ]0;paleboy@Arch-Box:~/School/Sys OPS[32m[[m[32m~/School/Sys OPS[m[32m]
+[m[31mpaleboy[m[33m->[m exit
+exit
+
+Script done on Sun 02 Oct 2016 10:07:30 AM EDT
