@@ -1,37 +1,29 @@
-/*
- *  Solution to Producer Consumer Problem
- *  Using Ptheads, a mutex and condition variables
- *  From Tanenbaum, Modern Operating Systems, 3rd Ed.
- */
-
-/*
-    In this version the buffer is a single number.
-    The producer is putting numbers into the shared buffer
-    (in this case sequentially)
-    And the consumer is taking them out.
-    If the buffer contains zero, that indicates that the buffer is empty.
-    Any other value is valid.
-*/
-
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <pthread.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 
-#define MAX 3		/* Numbers to produce */
+#define MAX 3		/* max allowed in buffer */
 pthread_mutex_t the_mutex;
 pthread_cond_t condc, condp;
 int buffer = 0;
+int maxProds = 4;
+int maxCons = 3;
 
 void* producer(void *ptr) {
   int i;
+  pid_t x = syscall(__NR_gettid);
 
   for (i = 1; i <= MAX; i++) {
-    pthread_mutex_lock(&the_mutex);	/* protect buffer */
-    while (buffer != 0){		       /* If there is something
-					  in the buffer then wait */
-      pthread_cond_wait(&condp, &the_mutex);
+    pthread_mutex_lock(&the_mutex);
+    while (buffer != 0){		       /* If there is something in the buffer then wait */
+    pthread_cond_wait(&condp, &the_mutex);
+    printf("Thread ID: %d Producer is waiting. \n", x);
     }
     buffer = i;
-    printf("Produced: %d  \n", buffer);
+    printf("Thread ID: %d Produced: %d  \n", x, buffer);
     pthread_cond_signal(&condc);	/* wake up consumer */
     pthread_mutex_unlock(&the_mutex);	/* release the buffer */
   }
@@ -40,15 +32,16 @@ void* producer(void *ptr) {
 
 void* consumer(void *ptr) {
   int i;
+  pid_t x = syscall(__NR_gettid);
 
   for (i = 1; i <= MAX; i++) {
-    pthread_mutex_lock(&the_mutex);	/* protect buffer */
-    while (buffer == 0){			/* If there is nothing in
-					   the buffer then wait */
-      pthread_cond_wait(&condc, &the_mutex);
+    pthread_mutex_lock(&the_mutex);
+    while (buffer == 0){			/* If there is nothing in the buffer then wait */
+    pthread_cond_wait(&condc, &the_mutex);
+    printf("Thread ID: %d Consumer is waiting. \n", x);
     }
     buffer = 0;
-    printf("Consumed: %d  \n", buffer);
+    printf("Thread ID: %d Consumed: %d  \n", x, buffer);
     pthread_cond_signal(&condp);	/* wake up consumer */
     pthread_mutex_unlock(&the_mutex);	/* release the buffer */
   }
@@ -57,41 +50,36 @@ void* consumer(void *ptr) {
 
 int main(int argc, char **argv)
 {
-  pthread_t prod[4], cons[3];
+  pthread_t prod[maxProds], cons[maxCons];
 
-  // Initialize the mutex and condition variables
-  /* What's the NULL for ??? */
   pthread_mutex_init(&the_mutex, NULL);
-  pthread_cond_init(&condc, NULL);		/* Initialize consumer condition variable */
-  pthread_cond_init(&condp, NULL);		/* Initialize producer condition variable */
+  pthread_cond_init(&condc, NULL);
+  pthread_cond_init(&condp, NULL);
 
-  // Create the threads
-  for (int i = 0; i < 4; i++)
+  /* Create the threads */
+  for (int i = 0; i < maxProds; i++)
   {
       pthread_create(&prod[i], NULL, producer, NULL);
   }
 
-  for (int i = 0; i < 3; i++)
+  for (int i = 0; i < maxCons; i++)
   {
       pthread_create(&cons[i], NULL, consumer, NULL);
   }
 
-  // Wait for the threads to finish
-  // Otherwise main might run to the end
-  // and kill the entire process when it exits
- for (int i = 0; i < 4; i++)
+  /* join the threads */
+ for (int i = 0; i < maxProds; i++)
  {
      pthread_join(prod[i], NULL);
  }
 
-for (int i = 0; i < 3; i++)
-{
+ for (int i = 0; i < maxCons; i++)
+ {
      pthread_join(cons[i], NULL);
-}
+ }
 
-  // Cleanup -- would happen automatically at end of program
-  pthread_mutex_destroy(&the_mutex);	/* Free up the_mutex */
-  pthread_cond_destroy(&condc);		/* Free up consumer condition variable */
-  pthread_cond_destroy(&condp);		/* Free up producer condition variable */
-
+  /* clean up */
+  pthread_mutex_destroy(&the_mutex);
+  pthread_cond_destroy(&condc);
+  pthread_cond_destroy(&condp);
 }
