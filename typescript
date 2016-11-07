@@ -1,0 +1,273 @@
+Script started on Sun 06 Nov 2016 09:20:23 PM EST
+]0;paleboy@Arch-Box:~[32m[[m[32m~[m[32m]
+[m[31mpaleboy[m[33m->[m cat Assignment4.c
+#include<stdio.h>
+#include<stdlib.h>
+
+struct Node  {
+	int size;
+    char id;
+	struct Node* next;
+	struct Node* prev;
+};
+
+struct Node* head;
+struct Node* temp;
+
+struct Node* GetNewNode(char id, int size) {
+	struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+	newNode->size = size;
+    newNode->id = id;
+	newNode->prev = NULL;
+	newNode->next = NULL;
+	return newNode;
+}
+
+void InsertAtTail(char id, int size) {
+	struct Node* temp = head;
+	struct Node* newNode = GetNewNode(id, size);
+	if(head == NULL) {
+		head = newNode;
+		return;
+	}
+	while(temp->next != NULL) temp = temp->next;
+	temp->next = newNode;
+	newNode->prev = temp;
+}
+
+void releaseNode(char x)
+{
+    struct Node* temp = head;
+    while (temp->id != x)
+    {
+        temp = temp->next;
+    }
+    temp->id = '*';
+}
+
+void combineNodes()
+{
+    int storedmem, onemem, twomem;
+    struct Node* temp = head;
+    struct Node* one;
+    struct Node* two;
+    while (temp->id != '*')
+    {
+        temp = temp->next;
+    }
+    one = temp;
+    two = temp->prev;
+    temp = temp->next;
+    if (temp->id == '*')
+    {
+        onemem = one->size;
+        twomem = temp->size;
+        storedmem = onemem + twomem;
+        InsertAtTail('*', storedmem);
+        if (head == one)
+        {
+            head = one->next;
+        }
+        if(head == temp)
+        {
+            head = temp->next;
+        }
+        temp = temp->next;
+        one->next = temp;
+        //two->next = temp;
+    }
+
+}
+
+void FirstFit(char id, int size)
+{
+    int extramem, currentmem;
+    struct Node* temp = head;
+    while (temp->size < size || temp->id != '*')
+    {
+        temp = temp->next;
+    }
+
+    if (temp->size >= size)
+    {
+        currentmem = temp->size;
+        extramem = currentmem - size;
+        if (extramem > 0)
+        {
+            InsertAtTail('*', extramem);
+        }
+    }
+
+    temp->id = id;
+    temp->size = size;
+}
+
+void BestFit(char id, int size)
+{
+    int extramem, currentmem;
+    struct Node* temp = head;
+    while (temp->size < size || temp->id != '*')
+    {
+        temp = temp->next;
+    }
+
+    if (temp->size == size )
+    {
+        temp->id = id;
+        temp->size = size;
+    }
+
+    if (temp->size == size + 1)
+    {
+        currentmem = temp->size;
+        extramem = currentmem - size;
+        if (extramem > 0)
+        {
+            InsertAtTail('*', extramem);
+        }
+        temp->id = id;
+        temp->size = size;
+    }
+
+    if (temp->size == size + 2)
+    {
+        currentmem = temp->size;
+        extramem = currentmem - size;
+        if (extramem > 0)
+        {
+            InsertAtTail('*', extramem);
+        }
+        temp->id = id;
+        temp->size = size;
+    }
+}
+
+void NextFit(char id, int size)
+{
+    int extramem, currentmem;
+    struct Node* temp = head;
+    while (temp->size < size || temp->id != '*')
+    {
+        temp = temp->next;
+    }
+
+    if (temp->size >= size)
+    {
+        currentmem = temp->size;
+        extramem = currentmem - size;
+        if (extramem > 0)
+        {
+            InsertAtTail('*', extramem);
+        }
+    }
+
+    temp->id = id;
+    temp->size = size;
+}
+
+void Print() {
+	struct Node* temp = head;
+	while(temp != NULL) {
+          printf("(%c ",temp->id);
+		printf("%d)",temp->size);
+		temp = temp->next;
+	}
+	printf("\n");
+}
+
+int main() {
+
+	head = NULL;
+
+    InsertAtTail('*',1);
+    InsertAtTail('A',4);
+    InsertAtTail('*',2);
+    InsertAtTail('B',1);
+    InsertAtTail('*',2);
+    InsertAtTail('C',5);
+    InsertAtTail('*',1);
+    InsertAtTail('D',8);
+    InsertAtTail('*',2);
+    InsertAtTail('E',2);
+    InsertAtTail('*',1);
+    InsertAtTail('F',4);
+    InsertAtTail('*',2);
+    InsertAtTail('G',3);
+    InsertAtTail('*',5);
+
+    printf("Initial List: \n");
+    Print();
+    printf("\n");
+    releaseNode('A');
+    printf("Relased A: \n");
+    Print();
+    printf("\n");
+    combineNodes();
+    printf("Combined adjacent free spaces: \n");
+    Print();
+    printf("\n");
+    FirstFit('Z', 5);
+    printf("Placed Z as a 5m size: \n");
+    Print();
+    printf("\n");
+    FirstFit('Y', 2);
+    printf("Placed Y as a 2m size: \n");
+    Print();
+    printf("\n");
+    printf("Released C: \n");
+    releaseNode('C');
+    Print();
+    printf("\n");
+    printf("Combinging adjacent free spaces: \n");
+    combineNodes();
+    Print();
+    printf("\n");
+    printf("Placing X as a 6m size: \n");
+    BestFit('X', 6);
+    combineNodes();
+    Print();
+    printf("\n");
+    printf("Placing W as a 4m size \n");
+    NextFit('W', 4);
+    Print();
+    printf("\n");
+
+    return 0;
+
+}
+]0;paleboy@Arch-Box:~[32m[[m[32m~[m[32m]
+[m[31mpaleboy[m[33m->[m gcc Assignment4.c -o ass4
+]0;paleboy@Arch-Box:~[32m[[m[32m~[m[32m]
+[m[31mpaleboy[m[33m->[m ./ass4
+Initial List: 
+(* 1)(A 4)(* 2)(B 1)(* 2)(C 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(* 5)
+
+Relased A: 
+(* 1)(* 4)(* 2)(B 1)(* 2)(C 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(* 5)
+
+Combined adjacent free spaces: 
+(* 2)(B 1)(* 2)(C 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(* 5)(* 5)
+
+Placed Z as a 5m size: 
+(* 2)(B 1)(* 2)(C 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(* 5)
+
+Placed Y as a 2m size: 
+(Y 2)(B 1)(* 2)(C 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(* 5)
+
+Released C: 
+(Y 2)(B 1)(* 2)(* 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(* 5)
+
+Combinging adjacent free spaces: 
+(Y 2)(B 1)(* 2)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(* 5)(* 7)
+
+Placing X as a 6m size: 
+(Y 2)(B 1)(* 2)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(* 5)(X 6)(* 1)(* 3)
+
+Placing W as a 4m size 
+(Y 2)(B 1)(* 2)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(W 4)(X 6)(* 1)(* 3)(* 1)
+
+]0;paleboy@Arch-Box:~[32m[[m[32m~[m[32m]
+[m[31mpaleboy[m[33m->[m exit
+exit
+
+Script done on Sun 06 Nov 2016 09:20:54 PM EST
