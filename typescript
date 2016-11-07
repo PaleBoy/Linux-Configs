@@ -1,133 +1,37 @@
-Script started on Wed 12 Oct 2016 04:53:26 PM EDT
-]0;paleboy@Arch-Box:~/School/Sys OPS[32m[[m[32m~/School/Sys OPS[m[32m]
-[m[31mpaleboy[m[33m->[m gcc PC.c -lpthread
-]0;paleboy@Arch-Box:~/School/Sys OPS[32m[[m[32m~/School/Sys OPS[m[32m]
-[m[31mpaleboy[m[33m->[m cat PC.C[Kc
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <pthread.h>
-#include <sys/types.h>
-#include <sys/syscall.h>
-#include <unistd.h>
+Script started on Sun 06 Nov 2016 07:33:02 PM EST
+]0;paleboy@Arch-Box:~[32m[[m[32m~[m[32m]
+[m[31mpaleboy[m[33m->[m gcc Assignment4.c -o ass4
+]0;paleboy@Arch-Box:~[32m[[m[32m~[m[32m]
+[m[31mpaleboy[m[33m->[m ./ass4
+Initial List: 
+(* 1)(A 4)(* 2)(B 1)(* 2)(C 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(* 5)
 
-#define MAX 3		/* max allowed in buffer */
-pthread_mutex_t the_mutex;
-pthread_cond_t condc, condp;
-int buffer = 0;
-int maxProds = 4;
-int maxCons = 3;
+Relased A: 
+(* 1)(* 4)(* 2)(B 1)(* 2)(C 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(* 5)
 
-void* producer(void *ptr) {
-  int i;
-  pid_t x = syscall(__NR_gettid);
+Combined adjacent free spaces: 
+(* 2)(B 1)(* 2)(C 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(* 5)(* 5)
 
-  for (i = 1; i <= MAX; i++) {
-    pthread_mutex_lock(&the_mutex);
-    while (buffer != 0){		       /* If there is something in the buffer then wait */
-    pthread_cond_wait(&condp, &the_mutex);
-    printf("Thread ID: %d Producer is waiting. \n", x);
-    }
-    buffer = i;
-    printf("Thread ID: %d Produced: %d  \n", x, buffer);
-    pthread_cond_signal(&condc);	/* wake up consumer */
-    pthread_mutex_unlock(&the_mutex);	/* release the buffer */
-  }
-  pthread_exit(0);
-}
+Placed Z as a 5m size: 
+(* 2)(B 1)(* 2)(C 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(* 5)
 
-void* consumer(void *ptr) {
-  int i;
-  pid_t x = syscall(__NR_gettid);
+Placed Y as a 2m size: 
+(Y 2)(B 1)(* 2)(C 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(* 5)
 
-  for (i = 1; i <= MAX; i++) {
-    pthread_mutex_lock(&the_mutex);
-    while (buffer == 0){			/* If there is nothing in the buffer then wait */
-    pthread_cond_wait(&condc, &the_mutex);
-    printf("Thread ID: %d Consumer is waiting. \n", x);
-    }
-    buffer = 0;
-    printf("Thread ID: %d Consumed: %d  \n", x, buffer);
-    pthread_cond_signal(&condp);	/* wake up consumer */
-    pthread_mutex_unlock(&the_mutex);	/* release the buffer */
-  }
-  pthread_exit(0);
-}
+Released C: 
+(Y 2)(B 1)(* 2)(* 5)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(* 5)
 
-int main(int argc, char **argv)
-{
-  pthread_t prod[maxProds], cons[maxCons];
+Combinging adjacent free spaces: 
+(Y 2)(B 1)(* 2)(* 1)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(* 5)(* 7)
 
-  pthread_mutex_init(&the_mutex, NULL);
-  pthread_cond_init(&condc, NULL);
-  pthread_cond_init(&condp, NULL);
+Placing X as a 6m size: 
+(Y 2)(B 1)(* 2)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(* 5)(X 6)(* 1)(* 3)
 
-  /* Create the threads */
-  for (int i = 0; i < maxProds; i++)
-  {
-      pthread_create(&prod[i], NULL, producer, NULL);
-  }
+Placing W as a 4m size 
+(Y 2)(B 1)(* 2)(D 8)(* 2)(E 2)(* 1)(F 4)(* 2)(G 3)(Z 5)(W 4)(X 6)(* 1)(* 3)(* 1)
 
-  for (int i = 0; i < maxCons; i++)
-  {
-      pthread_create(&cons[i], NULL, consumer, NULL);
-  }
-
-  /* join the threads */
- for (int i = 0; i < maxProds; i++)
- {
-     pthread_join(prod[i], NULL);
- }
-
- for (int i = 0; i < maxCons; i++)
- {
-     pthread_join(cons[i], NULL);
- }
-
-  /* clean up */
-  pthread_mutex_destroy(&the_mutex);
-  pthread_cond_destroy(&condc);
-  pthread_cond_destroy(&condp);
-}
-]0;paleboy@Arch-Box:~/School/Sys OPS[32m[[m[32m~/School/Sys OPS[m[32m]
-[m[31mpaleboy[m[33m->[m ./a.out
-Thread ID: 1297 Produced: 1  
-Thread ID: 1301 Consumed: 0  
-Thread ID: 1297 Producer is waiting. 
-Thread ID: 1297 Produced: 2  
-Thread ID: 1301 Consumer is waiting. 
-Thread ID: 1301 Consumed: 0  
-Thread ID: 1298 Producer is waiting. 
-Thread ID: 1298 Produced: 1  
-Thread ID: 1302 Consumer is waiting. 
-Thread ID: 1302 Consumed: 0  
-Thread ID: 1299 Producer is waiting. 
-Thread ID: 1299 Produced: 1  
-Thread ID: 1303 Consumer is waiting. 
-Thread ID: 1303 Consumed: 0  
-Thread ID: 1300 Producer is waiting. 
-Thread ID: 1300 Produced: 1  
-Thread ID: 1301 Consumer is waiting. 
-Thread ID: 1301 Consumed: 0  
-Thread ID: 1297 Producer is waiting. 
-Thread ID: 1297 Produced: 3  
-Thread ID: 1302 Consumer is waiting. 
-Thread ID: 1302 Consumed: 0  
-Thread ID: 1298 Producer is waiting. 
-Thread ID: 1298 Produced: 2  
-Thread ID: 1302 Consumer is waiting. 
-Thread ID: 1302 Consumed: 0  
-Thread ID: 1299 Producer is waiting. 
-Thread ID: 1299 Produced: 2  
-Thread ID: 1303 Consumed: 0  
-Thread ID: 1300 Producer is waiting. 
-Thread ID: 1300 Produced: 2  
-Thread ID: 1303 Consumer is waiting. 
-Thread ID: 1303 Consumed: 0  
-Thread ID: 1298 Producer is waiting. 
-Thread ID: 1298 Produced: 3  
-^C
-]0;paleboy@Arch-Box:~/School/Sys OPS[32m[[m[32m~/School/Sys OPS[m[32m]
+]0;paleboy@Arch-Box:~[32m[[m[32m~[m[32m]
 [m[31mpaleboy[m[33m->[m exit
 exit
 
-Script done on Wed 12 Oct 2016 04:54:12 PM EDT
+Script done on Sun 06 Nov 2016 07:33:23 PM EST
